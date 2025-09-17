@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Firebase Google 登入</title>
+</head>
+<body>
+    <h1>Firebase Google 登入教學</h1>
+    <button id="login-button">使用 Google 登入</button>
+    <button id="logout-button" style="display:none;">登出</button>
+    <div id="user-info" style="display:none;">
+        <p>歡迎, <span id="user-name"></span>!</p>
+        <img id="user-photo" src="" alt="使用者頭像" style="width:100px; height:100px;">
+    </div>
+
+    <!-- Firebase App (核心) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+
+    <script>
+        // 貼上您從 Firebase 複製的 firebaseConfig 物件
+        const firebaseConfig = {
+          apiKey: "AIzaSyBjhNiW8DcMO7SxLQ6T4Xo8uR3LtYosOB8",
+          authDomain: "test1-9dfa1.firebaseapp.com",
+          projectId: "test1-9dfa1",
+          storageBucket: "test1-9dfa1.firebasestorage.app",
+          messagingSenderId: "727782947676",
+          appId: "1:727782947676:web:e25a800e0f7ca98dc35f99",
+          measurementId: "G-VHNV34RBFL"
+        };
+
+        // 初始化 Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        const loginButton = document.getElementById('login-button');
+        const logoutButton = document.getElementById('logout-button');
+        const userInfo = document.getElementById('user-info');
+        const userName = document.getElementById('user-name');
+        const userPhoto = document.getElementById('user-photo');
+
+        // 登入功能
+        loginButton.addEventListener('click', () => {
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    console.log(user);
+                    updateUI(user);
+                }).catch((error) => {
+                    console.error(error);
+                });
+        });
+
+        // 登出功能
+        logoutButton.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                updateUI(null);
+            }).catch((error) => {
+                console.error(error);
+            });
+        });
+
+        // 監聽認證狀態變化
+        auth.onAuthStateChanged((user) => {
+            updateUI(user);
+        });
+
+        // 更新 UI
+        function updateUI(user) {
+            if (user) {
+                loginButton.style.display = 'none';
+                logoutButton.style.display = 'block';
+                userInfo.style.display = 'block';
+                userName.textContent = user.displayName;
+                userPhoto.src = user.photoURL;
+            } else {
+                loginButton.style.display = 'block';
+                logoutButton.style.display = 'none';
+                userInfo.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
